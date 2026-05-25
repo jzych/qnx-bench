@@ -1,0 +1,13 @@
+# Insert this fragment into the local QNX guest BSP buildfile for Guest B.
+# It is intentionally a fragment so QNX-provided buildfiles are not committed.
+
+/usr/bin/telemetry-consumer=telemetry-consumer
+
+[perms=0755] /scripts/telemetry-consumer-start.sh = {
+#!/bin/sh
+telemetry-consumer 0x1c050000 38
+}
+
+# Add near the guest startup section:
+# display_msg "Starting telemetry consumer ..."
+# /scripts/telemetry-consumer-start.sh &

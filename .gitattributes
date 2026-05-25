@@ -1,0 +1,10 @@
+*.md text eol=lf
+.gitignore text eol=lf
+env.example text eol=lf
+*.sh text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+*.json text eol=lf
+*.fragment text eol=lf
+*.build text eol=lf
+*.ps1 text eol=crlf

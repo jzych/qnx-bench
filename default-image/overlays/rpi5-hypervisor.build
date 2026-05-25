@@ -1,0 +1,56 @@
+#
+# Project overlay buildfile for the Raspberry Pi 5 Hypervisor host image.
+# This wrapper includes the local BSP common buildfile from the copied .work BSP.
+#
+
+[+include] rpi5-common.build
+
+[type=link] /usr/lib/ldqnx-64.so.2=/proc/boot/ldqnx-64.so.2
+
+#
+# Host Hypervisor tools and vdev libraries.
+#
+/sbin/qvm=qvm
+/lib/dll/vdev-shmem.so=vdev-shmem.so
+/lib/dll/vdev-virtio-blk.so=vdev-virtio-blk.so
+/lib/dll/vdev-virtio-net.so=vdev-virtio-net.so
+/lib/dll/vdev-wdt.so=vdev-wdt.so
+/lib/dll/mods-vdevpeer-net.so=mods-vdevpeer-net.so
+
+#
+# Remote development helpers.
+#
+/usr/sbin/qconn=qconn
+/usr/bin/pdebug=pdebug
+/sbin/devc-pty=devc-pty
+
+#
+# Persistent partition mount and manual guest helpers.
+#
+[perms=0755] /scripts/mount_gpt_layout.sh = {
+#!/bin/sh
+mkdir -p /qnx/system_a /qnx/system_b /qnx/config /qnx/var /vmstore /qnx/dumps
+mount -t qnx6 /dev/hd0t179.2 /qnx/system_a
+mount -t qnx6 /dev/hd0t179.3 /qnx/system_b
+mount -t qnx6 /dev/hd0t179.4 /qnx/config
+mount -t qnx6 /dev/hd0t179.5 /qnx/var
+mount -t qnx6 /dev/hd0t179.6 /vmstore
+mount -t qnx6 /dev/hd0t179.7 /qnx/dumps
+}
+
+[perms=0755] /scripts/start_guest1.sh = {
+#!/bin/sh
+qvm @/qnx/system_a/guests/guest1-noblk.qvmconf
+}
+
+[perms=0755] /scripts/start_guest2.sh = {
+#!/bin/sh
+qvm @/qnx/system_b/guests/guest2-noblk.qvmconf
+}
+
+[perms=0755] /scripts/start_phase2_guests.sh = {
+#!/bin/sh
+/scripts/start_guest2.sh &
+sleep 1
+/scripts/start_guest1.sh &
+}

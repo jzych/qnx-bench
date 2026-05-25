@@ -1,69 +1,81 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-*.so.*
-
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# Build directories
+# Local build workspace and generated output
+.work/
+out/
+output/
 build/
-Build/
-build-*/
+staging/
+upload/
+tmp/
+temp/
 
-# CMake generated files
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-install_manifest.txt
-compile_commands.json
+# Generated QNX images and binaries
+*.ifs
+*.bin
+*.raw
+*.img
+*.qnx6.img
+*.fat32.img
+*.vmdk
+disk-qemu
+rpi5-qnx8-hyp-gpt.img
 
-# Temporary files
-*.tmp
+# Compiler/linker artifacts
+*.o
+*.a
+*.so
+*.sym
+*.map
+*.dep
+*.pinfo
+*.err
+*.gcno
+*.gcda
+
+# QNX vendor BSP/SDP/package content must stay outside git
+bsp/
+targets/
+prebuilt/
+install/
+binary_files_with_symbols/
+BSP_*.zip
+*.zip
+
+# Raspberry Pi boot payloads copied from local BSP/output
+boot-source/
+rpi5-boot-source/
+kernel*.img
+initramfs*
+*.dtb
+*.dtbo
+start*.elf
+fixup*.dat
+bootcode.bin
+
+# Secrets and machine-local connection state
+*.pem
+*_key
+*_key.pub
+known_hosts
+ssh_host_*_key
+ssh_host_*_key.pub
+.env
+.env.*
+!env.example
+
+# Logs and crash dumps
 *.log
-*.bak
-*.swp
+*.core
+core
+slog*.txt
+drm-detect-displays.log
 
-# vcpkg
-vcpkg_installed/
+# Editor and OS metadata
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
 
-# debug information files
-*.dwo
-
-# test output & cache
-Testing/
-.cache/
+# Local agent scratch notes
+AGENTS.md
+.tasks/

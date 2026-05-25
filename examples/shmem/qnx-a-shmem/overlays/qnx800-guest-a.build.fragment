@@ -1,0 +1,13 @@
+# Insert this fragment into the local QNX guest BSP buildfile for Guest A.
+# It is intentionally a fragment so QNX-provided buildfiles are not committed.
+
+/usr/bin/telemetry-producer=telemetry-producer
+
+[perms=0755] /scripts/telemetry-producer-start.sh = {
+#!/bin/sh
+telemetry-producer 0x1c050000 1000
+}
+
+# Add near the guest startup section:
+# display_msg "Starting telemetry producer ..."
+# /scripts/telemetry-producer-start.sh &

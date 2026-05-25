@@ -1,0 +1,15 @@
+{
+  "hostBuildTarget": "screen-remote-debug-wifi-hypervisor",
+  "hostIfsName": "ifs-rpi5.bin",
+  "hypervisorStartup": "-Q enable,el1-host",
+  "guestAutostart": false,
+  "partitions": [
+    { "name": "boot", "size": "512MiB", "type": "FAT32", "mount": "/boot" },
+    { "name": "system_a", "size": "2GiB", "type": "QNX6", "mount": "/qnx/system_a" },
+    { "name": "system_b", "size": "2GiB", "type": "QNX6", "mount": "/qnx/system_b" },
+    { "name": "config", "size": "1GiB", "type": "QNX6", "mount": "/qnx/config" },
+    { "name": "var", "size": "4GiB", "type": "QNX6", "mount": "/qnx/var" },
+    { "name": "vmstore", "size": "48GiB", "type": "QNX6", "mount": "/vmstore" },
+    { "name": "dumps", "size": "rest", "type": "QNX6/raw", "mount": "/qnx/dumps" }
+  ]
+}
