@@ -19,10 +19,29 @@ directories should stay outside git.
 Set `QNX_ENV` or pass `-QnxEnv` to scripts:
 
 ```powershell
-$env:QNX_ENV = "C:\Users\jzych\qnx800\qnxsdp-env.bat"
+$env:QNX_ENV = "X:\YOUR\PATH\TO\qnx800\qnxsdp-env.bat"
 ```
 
+Verify the environment path exists before starting a build:
+
+```powershell
+Test-Path $env:QNX_ENV
+```
+
+## Boot Payload
+
+Pass the Raspberry Pi FAT boot partition payload directory to
+`-BootSource`. On the current bench host this has been:
+
+```powershell
+M:\CodingProjects\qnxprojects\targets\rpi5-boot-source
+```
+
+The boot payload is an external local input and must stay outside git.
+
 ## Workspace Bootstrap
+
+Copy local BSP workspaces into ignored `.work\bsp\`:
 
 ```powershell
 .\default-image\scripts\bootstrap-workspace.ps1 `
@@ -32,3 +51,10 @@ $env:QNX_ENV = "C:\Users\jzych\qnx800\qnxsdp-env.bat"
 
 This copies local BSP workspaces into `.work\bsp\`. That directory is ignored by
 git.
+
+Verify the copied workspaces exist:
+
+```powershell
+Test-Path .work\bsp\rpi5-psb
+Test-Path .work\bsp\hyp-guest-arm
+```

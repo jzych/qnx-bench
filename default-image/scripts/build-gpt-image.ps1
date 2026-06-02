@@ -22,8 +22,8 @@ $repoRoot = Get-RepoRoot
 $bootSourceResolved = Resolve-RequiredPath -Path $BootSource -Description "boot source directory"
 
 if (-not $HostIfs) { $HostIfs = Join-Path $WorkDir "bsp\rpi5-psb\images\ifs-rpi5.bin" }
-if (-not $Guest1Ifs) { $Guest1Ifs = Join-Path $WorkDir "bsp\hyp-guest-arm\images\guest-1\qnx800-guest-aarch64-le.ifs" }
-if (-not $Guest2Ifs) { $Guest2Ifs = Join-Path $WorkDir "bsp\hyp-guest-arm\images\guest-2\qnx800-guest-aarch64-le.ifs" }
+if (-not $Guest1Ifs) { $Guest1Ifs = Join-Path $WorkDir "bsp\hyp-guest-arm\images\guest-1\qnx800-guest-1.ifs" }
+if (-not $Guest2Ifs) { $Guest2Ifs = Join-Path $WorkDir "bsp\hyp-guest-arm\images\guest-2\qnx800-guest-2.ifs" }
 if (-not $Guest1Conf) { $Guest1Conf = Join-Path $repoRoot "default-image\overlays\qvmtest\guest1-noblk.qvmconf" }
 if (-not $Guest2Conf) { $Guest2Conf = Join-Path $repoRoot "default-image\overlays\qvmtest\guest2-noblk.qvmconf" }
 

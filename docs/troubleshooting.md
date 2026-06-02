@@ -45,6 +45,40 @@ su root
 /qnx/config/qvmtest/start-qvm-minimal-verify.sh
 ```
 
+## Missing `/qnx` Or `/vmstore`
+
+If `/qnx` or `/vmstore` is missing, the target is not booted with the repaired
+default host IFS. Rebuild and flash the default GPT image. The host IFS must
+embed those mountpoints because the root IFS cannot create new top-level
+directories at runtime.
+
+If the mountpoints exist but `/qnx/config/qvmtest` is missing, inspect the
+automount log and retry the mount helper:
+
+```sh
+su root
+cat /dev/shmem/mount_gpt_layout.log
+/scripts/mount_gpt_layout.sh
+mount
+```
+
+On Raspberry Pi 5 the expected partition devices are usually
+`/dev/sd0.qnx6.1` through `/dev/sd0.qnx6.6`.
+
+## Upload Permission Denied
+
+If `upload-all.ps1` cannot create `/qnx/config/upload`, inspect the automount
+log and retry the mount helper as root:
+
+```sh
+su root
+cat /dev/shmem/mount_gpt_layout.log
+/scripts/mount_gpt_layout.sh
+```
+
+The repaired helper creates `/qnx/config/upload`, assigns it to `qnxuser`, and
+sets mode `0755`.
+
 ## Missing qvmtest Directory
 
 If `/qnx/config/qvmtest/start-qvm-minimal-verify.sh` is missing, rebuild the GPT

@@ -5,6 +5,7 @@
 From the repository root:
 
 ```powershell
+$env:QNX_ENV = "X:\YOUR\PATH\TO\qnx800\qnxsdp-env.bat"
 .\examples\shmem\scripts\build-all.ps1
 ```
 
@@ -16,10 +17,27 @@ The script expects the QNX generic ARM Hypervisor guest BSP workspace at
   -HypGuestBspSource M:\CodingProjects\qnxprojects\bsp\hyp-guest-arm
 ```
 
+The current build outputs are:
+
+- `.work\bsp\hyp-guest-arm\images\guest-1\qnx800-guest-1.ifs`
+- `.work\bsp\hyp-guest-arm\images\guest-2\qnx800-guest-2.ifs`
+
+These filenames are what the upload scripts stage on the target.
+
+## Target Mounts
+
+New default images mount the GPT data partitions automatically at boot. Verify
+the mount state before upload, install, run, or verify:
+
+```sh
+mount
+cat /dev/shmem/mount_gpt_layout.log
+```
+
 ## Upload
 
 ```powershell
-.\examples\shmem\scripts\upload-all.ps1 -Target 192.168.0.31
+.\examples\shmem\scripts\upload-all.ps1 -Target [ip-address]
 ```
 
 The script uses `scp` and `ssh`; enter target passwords interactively unless you

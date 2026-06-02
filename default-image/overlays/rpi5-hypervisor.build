@@ -3,6 +3,14 @@
 # This wrapper includes the local BSP common buildfile from the copied .work BSP.
 #
 
+[-optional]
+[+keeplinked]
+[image=0x80000]
+[virtual=aarch64le,raw -compress] boot = {
+    startup-bcm2712-rpi5 -v -u reg -a -W 5000 -Q enable,el1-host
+    PATH=/proc/boot:/sbin:/bin:/usr/bin:/usr/sbin:/usr/libexec LD_LIBRARY_PATH=/proc/boot:/lib:/usr/lib:/lib/dll:/lib/dll/pci procnto-smp-instr -v
+}
+
 [+include] rpi5-common.build
 
 [type=link] /usr/lib/ldqnx-64.so.2=/proc/boot/ldqnx-64.so.2
@@ -11,41 +19,99 @@
 # Host Hypervisor tools and vdev libraries.
 #
 /sbin/qvm=qvm
+/lib/dll/vdev-pl011.so=vdev-pl011.so
 /lib/dll/vdev-shmem.so=vdev-shmem.so
+/lib/dll/vdev-smmu.so=vdev-smmu.so
 /lib/dll/vdev-virtio-blk.so=vdev-virtio-blk.so
+/lib/dll/vdev-virtio-console.so=vdev-virtio-console.so
 /lib/dll/vdev-virtio-net.so=vdev-virtio-net.so
-/lib/dll/vdev-wdt.so=vdev-wdt.so
+/lib/dll/vdev-wdt-sp805.so=vdev-wdt-sp805.so
 /lib/dll/mods-vdevpeer-net.so=mods-vdevpeer-net.so
-
-#
-# Remote development helpers.
-#
-/usr/sbin/qconn=qconn
-/usr/bin/pdebug=pdebug
-/sbin/devc-pty=devc-pty
 
 #
 # Persistent partition mount and manual guest helpers.
 #
+[uid=0 gid=0 type=dir dperms=0755] /qnx
+[uid=0 gid=0 type=dir dperms=0755] /qnx/system_a
+[uid=0 gid=0 type=dir dperms=0755] /qnx/system_b
+[uid=0 gid=0 type=dir dperms=0755] /qnx/config
+[uid=0 gid=0 type=dir dperms=0755] /qnx/var
+[uid=0 gid=0 type=dir dperms=0755] /qnx/dumps
+[uid=0 gid=0 type=dir dperms=0755] /vmstore
+
 [perms=0755] /scripts/mount_gpt_layout.sh = {
 #!/bin/sh
-mkdir -p /qnx/system_a /qnx/system_b /qnx/config /qnx/var /vmstore /qnx/dumps
-mount -t qnx6 /dev/hd0t179.2 /qnx/system_a
-mount -t qnx6 /dev/hd0t179.3 /qnx/system_b
-mount -t qnx6 /dev/hd0t179.4 /qnx/config
-mount -t qnx6 /dev/hd0t179.5 /qnx/var
-mount -t qnx6 /dev/hd0t179.6 /vmstore
-mount -t qnx6 /dev/hd0t179.7 /qnx/dumps
+set -u
+
+if ! mount | grep -q " on /qnx/system_a "; then
+    mount -t qnx6 /dev/sd0.qnx6.1 /qnx/system_a
+fi
+
+if ! mount | grep -q " on /qnx/system_b "; then
+    mount -t qnx6 /dev/sd0.qnx6.2 /qnx/system_b
+fi
+
+if ! mount | grep -q " on /qnx/config "; then
+    mount -t qnx6 /dev/sd0.qnx6.3 /qnx/config
+fi
+
+if ! mount | grep -q " on /qnx/var "; then
+    mount -t qnx6 /dev/sd0.qnx6.4 /qnx/var
+fi
+
+if ! mount | grep -q " on /vmstore "; then
+    mount -t qnx6 /dev/sd0.qnx6.5 /vmstore
+fi
+
+if ! mount | grep -q " on /qnx/dumps "; then
+    mount -t qnx6 /dev/sd0.qnx6.6 /qnx/dumps
+fi
+
+if [ -d /qnx/config ]; then
+    mkdir -p /qnx/config/upload
+    chown qnxuser:qnxuser /qnx/config/upload 2>/dev/null || true
+    chmod 0755 /qnx/config/upload
+    chmod 0755 /qnx/config/qvmtest/*.sh 2>/dev/null || true
+fi
+}
+
+[perms=0755] /scripts/auto_mount_gpt_layout.sh = {
+#!/bin/sh
+LOG=/dev/shmem/mount_gpt_layout.log
+tries=0
+
+echo "auto_mount_gpt_layout: waiting for GPT data partitions" > "$LOG"
+waitfor /dev/sd0.qnx6.6 15 >> "$LOG" 2>&1 || true
+
+while [ "$tries" -lt 5 ]; do
+    tries=`expr "$tries" + 1`
+    echo "auto_mount_gpt_layout: mount attempt $tries" >> "$LOG"
+    /scripts/mount_gpt_layout.sh >> "$LOG" 2>&1 || true
+
+    if mount | grep -q " on /qnx/system_a " &&
+       mount | grep -q " on /qnx/system_b " &&
+       mount | grep -q " on /qnx/config " &&
+       mount | grep -q " on /qnx/var " &&
+       mount | grep -q " on /vmstore " &&
+       mount | grep -q " on /qnx/dumps "; then
+        echo "auto_mount_gpt_layout: all GPT data partitions mounted" >> "$LOG"
+        break
+    fi
+
+    sleep 1
+done
+
+mount >> "$LOG" 2>&1 || true
 }
 
 [perms=0755] /scripts/start_guest1.sh = {
 #!/bin/sh
-qvm @/qnx/system_a/guests/guest1-noblk.qvmconf
+qvm @/qnx/config/qvmtest/guest1-noblk.qvmconf
 }
 
 [perms=0755] /scripts/start_guest2.sh = {
 #!/bin/sh
-qvm @/qnx/system_b/guests/guest2-noblk.qvmconf
+qvm @/qnx/config/qvmtest/guest2-noblk.qvmconf
 }
 
 [perms=0755] /scripts/start_phase2_guests.sh = {

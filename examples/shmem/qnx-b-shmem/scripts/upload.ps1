@@ -7,7 +7,7 @@ param(
 $root = Resolve-Path (Join-Path $PSScriptRoot "..\..\..\..")
 if (-not $WorkDir) { $WorkDir = Join-Path $root ".work" }
 
-$ifs = Join-Path $WorkDir "bsp\hyp-guest-arm\images\guest-2\qnx800-guest-aarch64-le.ifs"
+$ifs = Join-Path $WorkDir "bsp\hyp-guest-arm\images\guest-2\qnx800-guest-2.ifs"
 if (-not (Test-Path -LiteralPath $ifs)) { throw "Guest B IFS not found: $ifs" }
 
 ssh "$User@$Target" "mkdir -p /qnx/config/upload"

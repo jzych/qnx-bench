@@ -6,28 +6,35 @@ configured shared-memory vdev.
 - `qnx-a-shmem` builds Guest A, the telemetry producer.
 - `qnx-b-shmem` builds Guest B, the telemetry consumer.
 
-The guests are copied to the target data partitions and started manually. They
-are not embedded into the Raspberry Pi 5 host IFS.
+The guests are copied to the target data partitions and started manually.
 
 See [docs/runbook.md](docs/runbook.md) for the full build, upload, run, and
 verification flow.
 
-## Target Install Paths
+## Minimal Flow
 
-Guest images must be installed into the persistent QNX6 system partitions:
+Build both guests from the repository root:
 
-- Guest A producer:
-  `/qnx/system_a/guests/qnx-guest-1/qnx800-guest-1.ifs`
-- Guest B consumer:
-  `/qnx/system_b/guests/qnx-guest-2/qnx800-guest-2.ifs`
+```powershell
+.\examples\shmem\scripts\build-all.ps1
+```
 
-The upload scripts first stage files in `/qnx/config/upload/`. After upload, run
-the target-side install helper as root:
+Upload the guest IFS files and install helper:
+
+```powershell
+.\examples\shmem\scripts\upload-all.ps1 -Target [ip-address] -User qnxuser
+```
+
+Install, run, and verify on the target:
 
 ```sh
 su root
 sh /qnx/config/upload/install-shmem-guests.sh
+/qnx/config/qvmtest/start-qvm-minimal-verify.sh
+pidin ar | grep qvm
+grep telemetry /dev/shmem/guest1-min.log
+grep telemetry /dev/shmem/guest2-min.log
 ```
 
-That helper mounts the GPT layout if needed, creates both guest directories,
-copies the uploaded IFS files to the right partitions, and runs `sync`.
+If `/qnx/config/upload` is missing, check `/dev/shmem/mount_gpt_layout.log` and
+run `/scripts/mount_gpt_layout.sh` as root.
