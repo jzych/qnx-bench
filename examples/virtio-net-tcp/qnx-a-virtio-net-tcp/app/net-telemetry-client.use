@@ -1,0 +1,4 @@
+net-telemetry-client [server_ip] [port] [period_ms]
+
+Connect to Guest B over virtio-net and send newline-delimited TCP telemetry.
+Defaults: server_ip=192.168.10.2 port=5001 period_ms=1000.

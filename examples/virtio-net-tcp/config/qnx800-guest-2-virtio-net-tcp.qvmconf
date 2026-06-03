@@ -1,0 +1,27 @@
+system qnx-guest-2
+
+ram 0x80000000,512M
+cpu
+
+load /qnx/system_b/guests/qnx-guest-2/qnx800-guest-2-virtio-net-tcp.ifs
+
+vdev pl011
+        hostdev >-
+        loc 0x1c090000
+        intr gic:37
+
+vdev virtio-console
+        loc 0x20000000
+        intr gic:42
+
+vdev virtio-net
+        loc 0x20040000
+        intr gic:43
+        peer /dev/qvm/qnx-guest-1/guest_to_guest
+        peerfeats 0x00007fc3
+        name guest_to_guest
+
+vdev wdt-sp805
+        loc 0x1c0f0000
+
+vdev smmu

@@ -1,0 +1,4 @@
+net-telemetry-server [port]
+
+Listen for one virtio-net TCP telemetry client at a time and log each line.
+Default: port=5001.
