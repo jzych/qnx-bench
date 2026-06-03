@@ -1,0 +1,4 @@
+udp-telemetry-server [port]
+
+Receive virtio-net UDP telemetry datagrams and reply with ACKs by default.
+Default: port=5002.

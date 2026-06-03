@@ -1,0 +1,5 @@
+udp-telemetry-client [server_ip] [port] [period_ms]
+
+Send newline-delimited UDP telemetry datagrams to Guest B over virtio-net.
+ACK handling is enabled by default at compile time.
+Defaults: server_ip=192.168.10.2 port=5002 period_ms=1000.
